@@ -1,6 +1,6 @@
 # OneScreen
 
-![OneScreen icon](Assets/AppIcon.svg)
+<img src="Assets/AppIcon.svg" alt="OneScreen icon" width="128">
 
 ## OneScreen for macOS
 
