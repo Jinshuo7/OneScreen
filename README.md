@@ -1,6 +1,8 @@
 # OneScreen
 
-<img src="Assets/AppIcon.svg" alt="OneScreen icon" width="128">
+<p align="center">
+  <img src="Assets/AppIcon.svg" alt="OneScreen icon" width="128">
+</p>
 
 ## OneScreen for macOS
 
