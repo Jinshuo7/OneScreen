@@ -5,12 +5,14 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 APP_NAME="OneScreen"
 VERSION="1.0"
 BUILD_DIR="$ROOT_DIR/build/release"
-APP_DIR="$BUILD_DIR/OneScreen.app"
+STAGING_DIR="/private/tmp/onescreen-release-stage"
+APP_DIR="$STAGING_DIR/OneScreen.app"
+OUTPUT_APP_DIR="$BUILD_DIR/OneScreen.app"
 CONTENTS_DIR="$APP_DIR/Contents"
 MACOS_DIR="$CONTENTS_DIR/MacOS"
 RESOURCES_DIR="$CONTENTS_DIR/Resources"
 RELEASE_ZIP="$BUILD_DIR/OneScreen-$VERSION.zip"
-ICONSET_DIR="$BUILD_DIR/OneScreen.iconset"
+ICONSET_DIR="$STAGING_DIR/OneScreen.iconset"
 ICON_FILE="$RESOURCES_DIR/AppIcon.icns"
 MODULE_CACHE_DIR="$ROOT_DIR/build/module-cache"
 ICON_GENERATOR="$BUILD_DIR/generate_icon"
@@ -20,7 +22,7 @@ cd "$ROOT_DIR"
 mkdir -p "$BUILD_DIR"
 mkdir -p "$MODULE_CACHE_DIR"
 export CLANG_MODULE_CACHE_PATH="$MODULE_CACHE_DIR"
-rm -rf "$APP_DIR" "$RELEASE_ZIP" "$ICONSET_DIR" "$ICON_GENERATOR"
+rm -rf "$STAGING_DIR" "$OUTPUT_APP_DIR" "$RELEASE_ZIP" "$ICON_GENERATOR"
 mkdir -p "$MACOS_DIR" "$RESOURCES_DIR"
 
 echo "Building $APP_NAME $VERSION..."
@@ -74,7 +76,12 @@ cat > "$CONTENTS_DIR/Info.plist" <<'PLIST'
 </plist>
 PLIST
 
-ditto -c -k --keepParent --norsrc --noextattr "$APP_DIR" "$RELEASE_ZIP"
+xattr -cr "$APP_DIR"
+xattr -rd com.apple.provenance "$APP_DIR" 2>/dev/null || true
+codesign --force --deep --sign - "$APP_DIR"
 
-echo "Created $APP_DIR"
+ditto -c -k --keepParent --norsrc --noextattr "$APP_DIR" "$RELEASE_ZIP"
+ditto --norsrc --noextattr "$APP_DIR" "$OUTPUT_APP_DIR"
+
+echo "Created $OUTPUT_APP_DIR"
 echo "Created $RELEASE_ZIP"
